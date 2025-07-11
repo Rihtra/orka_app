@@ -83,14 +83,6 @@ ${organisasi.deskripsi ?? 'Tidak ada deskripsi'}
     switch (tipe.toLowerCase()) {
       case 'himpunan':
         return 'Himpunan';
-      case 'organisasi keagamaan':
-        return 'Organisasi Keagamaan';
-      case 'olahraga':
-        return 'Olahraga';
-      case 'seni & budaya':
-        return 'Seni & Budaya';
-      case 'akademik':
-        return 'Akademik';
       default:
         return 'Organisasi';
     }
@@ -100,14 +92,6 @@ ${organisasi.deskripsi ?? 'Tidak ada deskripsi'}
     switch (tipe.toLowerCase()) {
       case 'himpunan':
         return Icons.computer;
-      case 'organisasi keagamaan':
-        return Icons.mosque;
-      case 'olahraga':
-        return Icons.sports_soccer;
-      case 'seni & budaya':
-        return Icons.music_note;
-      case 'akademik':
-        return Icons.language;
       default:
         return Icons.group;
     }
@@ -117,16 +101,8 @@ ${organisasi.deskripsi ?? 'Tidak ada deskripsi'}
     switch (tipe.toLowerCase()) {
       case 'himpunan':
         return Color(0xFF3B82F6);
-      case 'organisasi keagamaan':
-        return Color(0xFF2563EB);
-      case 'olahraga':
-        return Color(0xFF2563EB);
-      case 'seni & budaya':
-        return Color(0xFF3B82F6);
-      case 'akademik':
-        return Color(0xFF1E40AF);
       default:
-        return Color(0xFF6B7280);
+        return Color.fromARGB(255, 17, 187, 79);
     }
   }
 }
@@ -159,10 +135,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final List<String> categories = [
     'Semua',
     'Himpunan',
-    'Organisasi Keagamaan',
-    'Olahraga',
-    'Seni & Budaya',
-    'Akademik',
     'Organisasi',
   ];
 

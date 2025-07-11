@@ -10,11 +10,9 @@ class CekStatus extends StatefulWidget {
 }
 
 class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
-  int _selectedIndex = 1; // Default to Cek Status tab
+  int _selectedIndex = 1;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
-  
-  // State management
   List<StatusUKM> statusList = [];
   bool isLoading = true;
   String? errorMessage;
@@ -34,7 +32,6 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
     _loadUserData();
   }
 
-  // Load user data dan fetch status pendaftaran
   Future<void> _loadUserData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -59,7 +56,6 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
     }
   }
 
-  // Fetch status pendaftaran dari API
   Future<void> _fetchStatusPendaftaran(int userId) async {
     try {
       setState(() {
@@ -67,40 +63,44 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
         errorMessage = null;
       });
 
-      final response = await ApiService.getPendaftaranByUserId(userId);
+      final rawResponse = await ApiService.getPendaftaranByUserId(userId);
+    final parsedResponse = PendaftaranResponse.fromJson(rawResponse);
       
-      if (response['success'] == true) {
-        // Jika ada data pendaftaran
-        if (response['data'] != null) {
-          final statusUkm = StatusUKM.fromJson(response['data']);
-          setState(() {
-            statusList = [statusUkm];
-            isLoading = false;
-          });
-          _fadeController.forward();
-        } else {
-          setState(() {
-            statusList = [];
-            isLoading = false;
-            errorMessage = 'Belum ada pendaftaran yang ditemukan.';
-          });
-        }
+      if (parsedResponse.success) {
+      if (parsedResponse.data != null && parsedResponse.data!.isNotEmpty) {
+        setState(() {
+          statusList = parsedResponse.data!;
+          isLoading = false;
+        });
+        _fadeController.forward();
+      } else if (parsedResponse.singleData != null) {
+        setState(() {
+          statusList = [parsedResponse.singleData!];
+          isLoading = false;
+        });
+        _fadeController.forward();
       } else {
         setState(() {
           statusList = [];
           isLoading = false;
-          errorMessage = response['message'] ?? 'Gagal mengambil data pendaftaran';
+          errorMessage = 'Belum ada pendaftaran yang ditemukan.';
         });
       }
-    } catch (e) {
+    } else {
       setState(() {
+        statusList = [];
         isLoading = false;
-        errorMessage = 'Error: ${e.toString()}';
+        errorMessage = parsedResponse.message ?? 'Gagal mengambil data pendaftaran';
       });
     }
+  } catch (e) {
+    setState(() {
+      isLoading = false;
+      errorMessage = 'Error: ${e.toString()}';
+    });
   }
+}
 
-  // Refresh data
   Future<void> _refreshData() async {
     if (currentUserId != null) {
       await _fetchStatusPendaftaran(currentUserId!);
@@ -123,6 +123,20 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
       );
     } else if (index == 2) {
       Navigator.pushNamedAndRemoveUntil(context, '/profile', (route) => false);
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'diterima':
+        return Colors.green;
+      case 'ditolak':
+        return Colors.red;
+      case 'wawancara':
+        return Colors.orange; // Color for wawancara
+      case 'pending':
+      default:
+        return Colors.grey;
     }
   }
 
@@ -153,8 +167,8 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        status.statusColor.withOpacity(0.2),
-                        status.statusColor.withOpacity(0.1),
+                        _getStatusColor(status.status).withOpacity(0.2),
+                        _getStatusColor(status.status).withOpacity(0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(20),
@@ -169,7 +183,7 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
                         return Icon(
                           Icons.groups,
                           size: 50,
-                          color: status.statusColor,
+                          color: _getStatusColor(status.status),
                         );
                       },
                     ),
@@ -215,7 +229,7 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: status.statusColor.withOpacity(0.1),
+                              color: _getStatusColor(status.status).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -223,7 +237,7 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: status.statusColor,
+                                color: _getStatusColor(status.status),
                               ),
                             ),
                           ),
@@ -250,8 +264,6 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
                           ),
                         ],
                       ),
-                      SizedBox(height: 12),
-                      
                       if (status.divisi != null) ...[
                         SizedBox(height: 12),
                         Row(
@@ -355,7 +367,6 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
         child: SafeArea(
           child: Column(
             children: [
-              // Premium App Bar
               Container(
                 margin: EdgeInsets.all(16),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -418,8 +429,6 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-
-              // Main Content
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
@@ -441,8 +450,6 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
                         ),
                       ),
                       SizedBox(height: 16),
-
-                      // Content
                       Expanded(
                         child: _buildContent(),
                       ),
@@ -589,8 +596,8 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                status.statusColor.withOpacity(0.2),
-                                status.statusColor.withOpacity(0.1),
+                                _getStatusColor(status.status).withOpacity(0.2),
+                                _getStatusColor(status.status).withOpacity(0.1),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(18),
@@ -605,7 +612,7 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
                                 return Icon(
                                   Icons.groups,
                                   size: 40,
-                                  color: status.statusColor,
+                                  color: _getStatusColor(status.status),
                                 );
                               },
                             ),
@@ -635,14 +642,14 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
                                       vertical: 6,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: status.statusColor.withOpacity(0.1),
+                                      color: _getStatusColor(status.status).withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
                                       status.status,
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: status.statusColor,
+                                        color: _getStatusColor(status.status),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -666,8 +673,6 @@ class _CekStatusState extends State<CekStatus> with TickerProviderStateMixin {
                                       horizontal: 10,
                                       vertical: 4,
                                     ),
-                                    
-                                    
                                   ),
                                   Container(
                                     padding: EdgeInsets.symmetric(

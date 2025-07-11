@@ -6,7 +6,7 @@ import 'dart:io';
 
 class ApiService {
   static const String baseUrl =
-      'http://192.168.45.253:8000/api'; // Ganti dengan URL API Anda
+      'https://2639557191e6.ngrok-free.app/api'; // Ganti dengan URL API Anda
 
   static Future<Map<String, String>> getHeaders() async {
     final token = await LocalStorage.getToken();
@@ -76,6 +76,24 @@ class ApiService {
       };
     }
   }
+  static Future<void> logout() async {
+  try {
+    final headers = await getHeaders();
+    final response = await http.post(
+      Uri.parse('$baseUrl/logout'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      // Hapus token dari LocalStorage
+      await LocalStorage.clearToken();
+    } else {
+      throw Exception('Gagal logout: ${response.body}');
+    }
+  } catch (e) {
+    throw Exception('Error saat logout: $e');
+  }
+}
 
   // GET: Mendapatkan semua organisasi
   static Future<List<OrganisasiModel>> getAllOrganisasi(String token) async {
@@ -192,11 +210,9 @@ class ApiService {
 
   // PUT: Update user profile
   static Future<Map<String, dynamic>> updateUserProfile({
-    required String nama,
-    required String nim,
-    required String jurusanId,
-    required String nomorHp,
-    required String semester,
+    String? noHp,
+    String? password,
+    String? password_confirmation,
   }) async {
     try {
       final headers = await getHeaders();
@@ -204,11 +220,9 @@ class ApiService {
         Uri.parse('$baseUrl/user/update'),
         headers: headers,
         body: jsonEncode({
-          'nama': nama, // Match Laravel controller field names
-          'nim': nim,
-          'jurusan': jurusanId,
-          'nomor_hp': nomorHp,
-          'semester': semester,
+          'no_hp': noHp,
+          'password': password,
+          'password_confirmation': password_confirmation,
         }),
       );
 
@@ -242,4 +256,5 @@ class ApiService {
       throw Exception(result['message'] ?? 'Upload gagal');
     }
   }
+  
 }

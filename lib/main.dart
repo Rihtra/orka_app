@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:multiplatform/status_pendaftaran.dart';
+import 'auth_check.dart';
 import 'login.dart';
 import 'home_page.dart';
 import 'register.dart'; // Untuk RegisterPage (pendaftaran akun)
@@ -20,12 +21,16 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: LoginPage(), // Halaman awal adalah LoginPage
+      initialRoute: '/auth-check', // Halaman awal adalah LoginPage
       routes: {
+        '/auth-check': (context) => const AuthCheck(),
+        '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(), // Rute ke HomePage
-        '/register': (context) => RegisterPage(), // Rute ke RegisterPage untuk registrasi akun
+        '/register':
+            (context) =>
+                RegisterPage(), // Rute ke RegisterPage untuk registrasi akun
         '/profile': (context) => ProfileUserPage(),
-        '/cek_status' :(context) => CekStatus(),
+        '/cek_status': (context) => CekStatus(),
         // RegistrationPage akan diakses dari DetailPage, tidak perlu rute terpisah di sini
       },
       debugShowCheckedModeBanner: false,

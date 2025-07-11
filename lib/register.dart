@@ -25,7 +25,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
   int? _selectedJurusanId;
 
   // API Configuration
-  static const String baseUrl = 'http://192.168.45.253:8000/api/register/';
+  static const String baseUrl = 'https://2639557191e6.ngrok-free.app/api/register/';
   
   final List<Map<String, dynamic>> _jurusanOptions = [
     {'id': 1, 'name': 'Teknik Informatika'},
@@ -510,7 +510,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushReplacementNamed(context, '/');
+                                Navigator.pushReplacementNamed(context, '/login');
                               },
                               child: Text(
                                 'Masuk',

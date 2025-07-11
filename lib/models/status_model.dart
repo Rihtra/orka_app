@@ -38,6 +38,9 @@ class StatusUKM {
       case 'ditolak':
         statusColor = Color(0xFFEF4444); // Red
         break;
+      case 'wawancara':
+        statusColor = Color.fromARGB(255, 139, 239, 68); // Red
+        break;
       case 'pending':
       default:
         statusColor = Color(0xFFF59E0B); // Yellow

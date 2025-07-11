@@ -514,14 +514,6 @@ class _DetailPageState extends State<DetailPage> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   SizedBox(height: 8),
-                                  Text(
-                                    widget.ukm.description,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white.withOpacity(0.9),
-                                      height: 1.4,
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -567,7 +559,7 @@ class _DetailPageState extends State<DetailPage> with TickerProviderStateMixin {
                                 // Deskripsi
                                 _buildPremiumSection(
                                   title: 'Tentang ${widget.ukm.name}',
-                                  content: _getDescription(widget.ukm.description),
+                                  content:(widget.ukm.description),
                                   icon: Icons.info_outline,
                                   color: Color(0xFF3B82F6),
                                 ),
@@ -1034,26 +1026,7 @@ class _DetailPageState extends State<DetailPage> with TickerProviderStateMixin {
     );
   }
 
-  String _getDescription(String ukmName) {
-    switch (ukmName) {
-      case 'HIMTI':
-        return 'Himpunan Mahasiswa Teknik Informatika (HIMTI) adalah organisasi mahasiswa yang berfokus pada pengembangan teknologi informasi dan komputer. Kami berkomitmen untuk menciptakan lingkungan belajar yang inovatif dan kolaboratif bagi seluruh mahasiswa TI di Politeknik Bengkalis.';
-      case 'HIMSIS':
-        return 'Himpunan Mahasiswa Sistem Informasi (HIMSIS) adalah wadah bagi mahasiswa untuk mengembangkan kemampuan dalam bidang sistem informasi dan teknologi bisnis. Kami mengintegrasikan teknologi dengan kebutuhan bisnis modern.';
-      case 'LDK Al-Islam':
-        return 'Lembaga Dakwah Kampus Al-Islam adalah organisasi keagamaan yang bergerak dalam bidang dakwah dan pengembangan spiritualitas Islam di lingkungan kampus. Kami mengajak mahasiswa untuk mendalami nilai-nilai Islam dalam kehidupan sehari-hari.';
-      case 'Persekutuan Kristen':
-        return 'Persekutuan Kristen adalah komunitas rohani yang menyediakan ruang bagi mahasiswa Kristen untuk bertumbuh dalam iman dan melayani sesama. Kami mengadakan ibadah, diskusi, dan kegiatan pelayanan sosial.';
-      case 'Futsal Club':
-        return 'Futsal Club Politeknik Bengkalis adalah organisasi olahraga yang menaungi mahasiswa yang memiliki passion dalam olahraga futsal. Kami mengembangkan bakat, prestasi, dan sportivitas melalui latihan dan kompetisi.';
-      case 'Paduan Suara':
-        return 'Paduan Suara Politeknik Bengkalis adalah kelompok seni musik vokal yang mengembangkan kemampuan bernyanyi dan apresiasi seni musik. Kami tampil dalam berbagai acara kampus dan kompetisi musik.';
-      case 'English Club':
-        return 'English Club adalah organisasi yang berfokus pada pengembangan kemampuan berbahasa Inggris mahasiswa. Kami mengadakan berbagai kegiatan untuk meningkatkan speaking, writing, dan communication skills.';
-      default:
-        return 'Organisasi mahasiswa yang berkomitmen untuk mengembangkan potensi dan bakat mahasiswa di bidangnya masing-masing.';
-    }
-  }
+
 
   String _getVisiMisi(String ukmName) {
     switch (ukmName) {

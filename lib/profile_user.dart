@@ -110,7 +110,7 @@ class _ProfileUserPageState extends State<ProfileUserPage>
           'semester': data['semester']?.toString() ?? 'N/A',
           'photoPath':
               data['foto'] != null
-                  ? 'http://192.168.45.253:8000/${data['foto']}'
+                  ? 'https://2639557191e6.ngrok-free.app/${data['foto']}'
                   : null,
           'organisasi': data['organisasi'] is List ? data['organisasi'] : [],
         };
@@ -133,6 +133,29 @@ class _ProfileUserPageState extends State<ProfileUserPage>
     }
   }
 
+  Future<void> _logout() async {
+    try {
+      // Call API to logout
+      await ApiService.logout();
+
+      // Show success message
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Berhasil logout')));
+
+      // Navigate to login page and remove all previous routes
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    } catch (e) {
+      print('Logout error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal logout: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   void _onItemTapped(int index) {
     if (index == _selectedIndex) return;
     setState(() => _selectedIndex = index);
@@ -150,119 +173,208 @@ class _ProfileUserPageState extends State<ProfileUserPage>
   }
 
   void _showEditProfileDialog() {
-    if (userData == null) return;
+  if (userData == null) return;
 
-    final namaController = TextEditingController(text: userData?['nama']);
-    final nimController = TextEditingController(text: userData?['nim']);
-    final jurusanController = TextEditingController(text: userData?['jurusan']);
-    final nomorHpController = TextEditingController(
-      text: userData?['nomor_hp'],
-    );
-    final semesterController = TextEditingController(
-      text: userData?['semester'],
-    );
+  final nomorHpController = TextEditingController(text: userData?['nomor_hp']);
+  final passwordController = TextEditingController();
+  final confirmPassword = TextEditingController();
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Edit Profil', style: GoogleFonts.poppins()),
-          content: SingleChildScrollView(
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 8,
+        backgroundColor: Colors.white,
+        child: Container(
+          padding: EdgeInsets.all(24),
+          constraints: BoxConstraints(maxWidth: 400, minWidth: 300),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.white, Color(0xFFF8F9FA)],
+            ),
+          ),
+          child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(
-                  controller: namaController,
-                  decoration: InputDecoration(labelText: 'Nama'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Edit Profil',
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2C3E50),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: Colors.grey[600]),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
                 ),
-                TextField(
-                  controller: nimController,
-                  decoration: InputDecoration(labelText: 'NIM'),
-                ),
-                TextField(
-                  controller: jurusanController,
-                  decoration: InputDecoration(labelText: 'Jurusan'),
-                ),
+                SizedBox(height: 20),
                 TextField(
                   controller: nomorHpController,
-                  decoration: InputDecoration(labelText: 'No. Handphone'),
+                  decoration: InputDecoration(
+                    labelText: 'No. Handphone',
+                    hintText: 'Masukkan nomor handphone',
+                    prefixIcon: Icon(Icons.phone, color: Color(0xFF3B82F6)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Color(0xFF3B82F6), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  ),
+                  keyboardType: TextInputType.phone,
+                  style: GoogleFonts.poppins(fontSize: 16),
                 ),
+                SizedBox(height: 16),
                 TextField(
-                  controller: semesterController,
-                  decoration: InputDecoration(labelText: 'Semester'),
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Kata Sandi Baru',
+                    hintText: 'Masukkan kata sandi baru',
+                    prefixIcon: Icon(Icons.lock, color: Color(0xFF3B82F6)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Color(0xFF3B82F6), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  ),
+                  obscureText: true,
+                  style: GoogleFonts.poppins(fontSize: 16),
+                ),
+                SizedBox(height: 16),
+                TextField(
+                  controller: confirmPassword,
+                  decoration: InputDecoration(
+                    labelText: 'Konfirmasi Kata Sandi',
+                    hintText: 'Konfirmasi kata sandi baru',
+                    prefixIcon: Icon(Icons.lock, color: Color(0xFF3B82F6)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Color(0xFF3B82F6), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  ),
+                  obscureText: true,
+                  style: GoogleFonts.poppins(fontSize: 16),
+                ),
+                SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text(
+                        'Batal',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Color(0xFFEF4444),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: () async {
+                        try {
+                          final updatedData = await ApiService.updateUserProfile(
+                            noHp: nomorHpController.text,
+                            password: passwordController.text,
+                            password_confirmation: confirmPassword.text,
+                          );
+
+                          if (updatedData != null) {
+                            setState(() {
+                              userData?['nomor_hp'] =
+                                  updatedData['no_hp']?.toString() ?? nomorHpController.text;
+                            });
+
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Profil berhasil diperbarui')),
+                            );
+                          } else {
+                            throw Exception('Response update tidak valid');
+                          }
+                        } catch (e) {
+                          print('Update error: $e');
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error updating profile: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF3B82F6),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 2,
+                      ),
+                      child: Text(
+                        'Simpan',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Batal'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  final updatedData = await ApiService.updateUserProfile(
-                    nama: namaController.text,
-                    nim: nimController.text,
-                    jurusanId: jurusanController.text,
-                    nomorHp: nomorHpController.text,
-                    semester: semesterController.text,
-                  );
-
-                  // Validasi response update
-                  if (updatedData != null) {
-                    setState(() {
-                      userData = {
-                        'nama':
-                            updatedData['name']?.toString() ??
-                            namaController.text,
-                        'nim':
-                            updatedData['nim']?.toString() ??
-                            nimController.text,
-                        'status': 'Mahasiswa Aktif',
-                        'jurusan':
-                            updatedData['jurusan']?.toString() ??
-                            jurusanController.text,
-                        'email':
-                            updatedData['email']?.toString() ??
-                            userData?['email'],
-                        'nomor_hp':
-                            updatedData['no_hp']?.toString() ??
-                            nomorHpController.text,
-                        'semester':
-                            updatedData['semester']?.toString() ??
-                            semesterController.text,
-                        'photoPath': userData?['photoPath'],
-                        'organisasi': userData?['organisasi'] ?? [],
-                      };
-                    });
-
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Profil berhasil diperbarui')),
-                    );
-                  } else {
-                    throw Exception('Response update tidak valid');
-                  }
-                } catch (e) {
-                  print('Update error: $e');
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error updating profile: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
-              child: Text('Simpan'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 
   @override
   void dispose() {
@@ -604,7 +716,6 @@ class _ProfileUserPageState extends State<ProfileUserPage>
                                     color: Color(0xFF2563EB),
                                   ),
                                   SizedBox(height: 16),
-
                                   Row(
                                     children: [
                                       Expanded(
@@ -629,21 +740,17 @@ class _ProfileUserPageState extends State<ProfileUserPage>
                                       SizedBox(width: 16),
                                       Expanded(
                                         child: OutlinedButton.icon(
-                                          onPressed: () {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  'Settings coming soon!',
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          icon: Icon(Icons.settings, size: 20),
-                                          label: Text('Pengaturan'),
+                                          onPressed: _logout,
+                                          icon: Icon(Icons.logout, size: 20),
+                                          label: Text('Logout'),
                                           style: OutlinedButton.styleFrom(
-                                            foregroundColor: Color(0xFF4A90E2),
+                                            backgroundColor: Color(0xFFEF4444),
+                                            foregroundColor: Color.fromARGB(
+                                              255,
+                                              255,
+                                              255,
+                                              255,
+                                            ),
                                             padding: EdgeInsets.symmetric(
                                               vertical: 16,
                                             ),
@@ -652,7 +759,7 @@ class _ProfileUserPageState extends State<ProfileUserPage>
                                                   BorderRadius.circular(12),
                                             ),
                                             side: BorderSide(
-                                              color: Color(0xFF4A90E2),
+                                              color: Color(0xFFEF4444),
                                             ),
                                           ),
                                         ),
